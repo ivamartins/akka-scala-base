@@ -26,6 +26,10 @@ import spray.json._
  * Then curl http://localhost:8080/hello
  *
  * See full portfolio: https://ivamartins.github.io/code-solutions-site/
+ *
+ * PT: Demonstra Akka Typed + Akka HTTP para serviços escaláveis e resilientes.
+ * Base mínima funcional para estender com Persistence (ótimo para modernização de legados),
+ * Clustering, integração com Kafka/Flink, chamadas de agentes IA, proxies para sistemas legados.
  */
 object AkkaHttpBase extends App with DefaultJsonProtocol {
 
