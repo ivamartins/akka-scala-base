@@ -3,3 +3,11 @@ target/
 *.iml
 *.log
 .DS_Store
+
+# Environment & Secrets (never commit real keys, tokens or auth state)
+.env
+.env.*
+*.pem
+*.key
+secrets/
+credentials/
