@@ -35,6 +35,24 @@ Examples:
 - curl http://localhost:8080/hello
 - curl http://localhost:8080/legacy/ORDER-456
 
+## Running the tests
+
+**Português:**
+
+```bash
+sbt test
+```
+
+Testes usam ScalaTest + Akka TestKit / HTTP testkit. Verificam as rotas HTTP e serviços sem iniciar servidor completo. Passam sem dependências externas.
+
+**English:**
+
+```bash
+sbt test
+```
+
+Tests use ScalaTest + Akka Typed TestKit and HTTP Route test support. They exercise routes and services without starting a full server. All basic tests pass with no external dependencies required.
+
 ## Extend for Real Projects
 
 - Add Akka Persistence for event-sourced aggregates (great for migrating legacy stateful systems).
