@@ -1,5 +1,14 @@
 # akka-scala-base
 
+Base funcional mínima em Akka (Typed + HTTP) com Scala.
+
+**Este é um exemplo de framework principal para construir serviços resilientes e escaláveis com Akka.**
+
+**Português (resumo):**
+Base funcional mínima para APIs HTTP de alto desempenho, event sourcing (ótimo para modernização de legados), clustering, integração com Kafka/Flink, chamadas de agentes IA, e wrappers para sistemas legados Java/Play.
+
+**English:**
+
 Minimal, functional Akka (Typed + HTTP) base in Scala.
 
 **This is a core framework example for building resilient, scalable services with Akka.**
