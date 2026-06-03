@@ -23,17 +23,43 @@ Minimal, functional Akka (Typed + HTTP) base in Scala.
   - AI agent calls from actors/routes
   - Wrapping legacy Java/Play systems
 
-## Quick Start (Functional)
+## Quick Start / Como rodar a aplicação
+
+**Pré-requisitos:** Java 11+ e sbt.
+
+**Passo a passo:**
+
+1. Clone e entre na pasta do projeto.
+2. Execute:
 
 ```bash
 sbt run
 ```
 
-Server runs on http://localhost:8080
+3. O servidor sobe em http://localhost:8080
 
-Examples:
-- curl http://localhost:8080/hello
-- curl http://localhost:8080/legacy/ORDER-456
+**Exemplos para testar:**
+- `curl http://localhost:8080/hello`
+- `curl http://localhost:8080/legacy/ORDER-456`
+
+**English:**
+
+**Prerequisites:** Java 11+ and sbt.
+
+**Step by step:**
+
+1. Clone and cd into the project folder.
+2. Run:
+
+```bash
+sbt run
+```
+
+3. Server starts on http://localhost:8080
+
+**Test examples:**
+- `curl http://localhost:8080/hello`
+- `curl http://localhost:8080/legacy/ORDER-456`
 
 ## Running the tests
 
