@@ -1,6 +1,6 @@
-# Class interaction flow — akka-scala-base
+# Fluxo de interação entre classes — akka-scala-base
 
-Quick visualization of how an HTTP request travels through the system down to the persistence actor.
+Visualização rápida de como uma requisição HTTP atravessa o sistema até o actor de persistência.
 
 ## 1. Bootstrap
 
@@ -8,45 +8,45 @@ Quick visualization of how an HTTP request travels through the system down to th
 AkkaHttpBase.main()                [AkkaHttpBase.scala]
   └─> ActorSystem(Behaviors.empty, "akka-http-base")
         └─> Http().newServerAt(0.0.0.0, 8080).bind(createRoute())
-              └─> OrderRoutes (instantiated with InMemoryOrderService)
+              └─> OrderRoutes (instanciado com InMemoryOrderService)
 ```
 
-## 2. Create order — `POST /orders`
+## 2. Criar pedido — `POST /orders`
 
 ```
-HTTP client (curl)
+Cliente HTTP (curl)
   └─> OrderRoutes.post()                 [http/OrderRoutes]
         └─> OrderService.create()        [persistence/OrderService — InMemoryOrderService]
               └─> Map.put(orderId, order)
 ```
 
-**Summary path:**
-`AkkaHttpBase → OrderRoutes → InMemoryOrderService (Map in memory)`
+**Caminho resumido:**
+`AkkaHttpBase → OrderRoutes → InMemoryOrderService (Map em memória)`
 
-> In production, `InMemoryOrderService` is swapped for `AkkaOrderService`, which does `actorRef.ask(...)` to the `OrderPersistentActor`.
+> Em produção, `InMemoryOrderService` é trocado por `AkkaOrderService`, que faz `actorRef.ask(...)` para o `OrderPersistentActor`.
 
-## 3. Get order — `GET /orders/{orderId}`
+## 3. Buscar pedido — `GET /orders/{orderId}`
 
 ```
-HTTP client (curl)
+Cliente HTTP (curl)
   └─> OrderRoutes.get()                  [http/OrderRoutes]
         └─> OrderService.get(orderId)    [persistence/OrderService — InMemoryOrderService]
               └─> Map.get(orderId)
 ```
 
-## 4. Change status — `PUT /orders/{orderId}`
+## 4. Mudar status — `PUT /orders/{orderId}`
 
 ```
-HTTP client (curl)
+Cliente HTTP (curl)
   └─> OrderRoutes.put()                  [http/OrderRoutes]
         └─> OrderService.changeStatus()  [persistence/OrderService — InMemoryOrderService]
               └─> Map.update(orderId, newStatus)
 ```
 
-## 5. Production mode (Akka Persistence + Cassandra)
+## 5. Modo produção (Akka Persistence + Cassandra)
 
 ```
-HTTP client (curl)
+Cliente HTTP (curl)
   └─> OrderRoutes                        [http/OrderRoutes]
         └─> AkkaOrderService             [persistence/OrderService]
               └─> actorRef.ask(CreateOrder)  ──> OrderPersistentActor
@@ -55,22 +55,22 @@ HTTP client (curl)
                                                         └─> snapshotEvery(100)       ──> Cassandra snapshot
 ```
 
-**Summary path (prod):**
+**Caminho resumido (prod):**
 `AkkaHttpBase → OrderRoutes → AkkaOrderService → OrderPersistentActor (EventSourcedBehavior) → Cassandra`
 
-## 6. Auxiliary endpoints
+## 6. Endpoints auxiliares
 
 ```
-HTTP client
-  ├─> GET /hello       ──> AkkaHttpBase.createRoute() (fixed response)
-  └─> GET /legacy/:id  ──> AkkaHttpBase.createRoute() (fixed response)
+Cliente HTTP
+  ├─> GET /hello       ──> AkkaHttpBase.createRoute() (resposta fixa)
+  └─> GET /legacy/:id  ──> AkkaHttpBase.createRoute() (resposta fixa)
 ```
 
-## Package map
+## Mapa de pacotes
 
 ```
 com.codesolutions.akka
-├── AkkaHttpBase.scala              ← main + routing
+├── AkkaHttpBase.scala              ← main + roteamento
 ├── domain/
 │   └── Order.scala                 ← case class
 ├── persistence/
@@ -81,6 +81,6 @@ com.codesolutions.akka
     └── OrderRoutes.scala            ← Akka HTTP routes
 ```
 
-## Errors
+## Erros
 
-`OrderRoutes` (in `http/`) responds 404 when the orderId doesn't exist and 400 when the payload is invalid (malformed JSON), via `Spray-JSON` `deserializationError`.
+`OrderRoutes` (em `http/`) responde 404 quando o orderId não existe e 400 quando o payload é inválido (JSON malformado), via `Spray-JSON` `deserializationError`.
