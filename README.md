@@ -69,9 +69,9 @@ Coverage:
 - `OrderRoutesSpec` — full HTTP REST lifecycle (POST, GET, PUT, 404, 400)
 - `AkkaHttpBaseSpec` — base endpoints
 
-## How it maps to the Caterpillar JD (Senior Software Engineer)
+## How it maps to common Scala/Akka requirements
 
-| JD requirement | Where in this repo |
+| Requirement | Where in this repo |
 |---|---|
 | 2+ years Scala | entire codebase |
 | 2+ years Akka (Streams, Actors, HTTP, Persistence) | `OrderPersistentActor` (Persistence), `OrderRoutes` (HTTP), Akka Typed Actors |
