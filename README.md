@@ -1,99 +1,96 @@
 # akka-scala-base
 
-Base funcional mínima em Akka (Typed + HTTP) com Scala.
-
-**Este é um exemplo de framework principal para construir serviços resilientes e escaláveis com Akka.**
-
-**Português (resumo):**
-Base funcional mínima para APIs HTTP de alto desempenho, event sourcing (ótimo para modernização de legados), clustering, integração com Kafka/Flink, chamadas de agentes IA, e wrappers para sistemas legados Java/Play.
-
-**English:**
-
-Minimal, functional Akka (Typed + HTTP) base in Scala.
-
-**This is a core framework example for building resilient, scalable services with Akka.**
-
-## Why this base?
-- Demonstrates "Scala/Akka" part of the stack.
-- Functional starting point for:
-  - High-performance HTTP APIs
-  - Event sourcing / persistence (Akka Persistence - perfect for legacy modernization)
-  - Clustering and sharding
-  - Integration with Kafka/Flink streams
-  - AI agent calls from actors/routes
-  - Wrapping legacy Java/Play systems
-
-## Quick Start / Como rodar a aplicação
-
-**Pré-requisitos:** Java 11+ e sbt.
-
-**Passo a passo:**
-
-1. Clone e entre na pasta do projeto.
-2. Execute:
-
-```bash
-sbt run
-```
-
-3. O servidor sobe em http://localhost:8080
-
-**Exemplos para testar:**
-- `curl http://localhost:8080/hello`
-- `curl http://localhost:8080/legacy/ORDER-456`
-
-**English:**
-
-**Prerequisites:** Java 11+ and sbt.
-
-**Step by step:**
-
-1. Clone and cd into the project folder.
-2. Run:
-
-```bash
-sbt run
-```
-
-3. Server starts on http://localhost:8080
-
-**Test examples:**
-- `curl http://localhost:8080/hello`
-- `curl http://localhost:8080/legacy/ORDER-456`
-
-## Running the tests
+Base funcional em Akka (Typed + HTTP + Persistence) com Scala.
 
 **Português:**
-
-```bash
-sbt test
-```
-
-Testes usam ScalaTest + Akka TestKit / HTTP testkit. Verificam as rotas HTTP e serviços sem iniciar servidor completo. Passam sem dependências externas.
+Framework principal para construir serviços resilientes, escaláveis e event-sourced com Akka. Inclui exemplo de Order domain com Event Sourcing (Akka Persistence Typed), HTTP REST API (Akka HTTP) e cobertura de testes completa.
 
 **English:**
+Core framework for building resilient, scalable, event-sourced services with Akka. Includes an Order domain example with Event Sourcing (Akka Persistence Typed), HTTP REST API (Akka HTTP) and full test coverage.
+
+## Why this base?
+
+- Demonstrates the "Scala/Akka" part of the stack.
+- Functional starting point for:
+  - High-performance HTTP APIs
+  - Event sourcing / persistence (Akka Persistence — perfect for legacy modernization)
+  - Clustering, sharding, persistence queries
+  - Integration with Kafka / Flink (combine with `flink-kafka-scala-base`)
+  - AI agent endpoints
+  - Legacy system proxies (wrap old Java / Play services)
+
+## What's in this repo
+
+```
+akka-scala-base/
+├── src/main/scala/com/codesolutions/akka/
+│   ├── AkkaHttpBase.scala              # main() — boots the HTTP server
+│   ├── domain/Order.scala              # domain model
+│   ├── persistence/
+│   │   ├── OrderProtocol.scala         # Commands, Events, Responses
+│   │   ├── OrderPersistentActor.scala  # EventSourcedBehavior
+│   │   └── OrderService.scala          # service trait + InMemoryOrderService
+│   └── http/OrderRoutes.scala          # Akka HTTP routes (REST)
+├── src/main/resources/application.conf
+├── src/test/scala/com/codesolutions/akka/
+│   ├── AkkaHttpBaseSpec.scala
+│   ├── http/OrderRoutesSpec.scala
+│   └── persistence/OrderPersistentActorSpec.scala
+└── build.sbt
+```
+
+## How to run
+
+```bash
+sbt run
+```
+
+Then in another terminal:
+
+```bash
+curl http://localhost:8080/hello
+curl -X POST http://localhost:8080/orders \
+  -H 'Content-Type: application/json' \
+  -d '{"orderId":"o1","customerId":"c1","amount":99.9}'
+curl http://localhost:8080/orders/o1
+curl -X PUT http://localhost:8080/orders/o1 \
+  -H 'Content-Type: application/json' \
+  -d '{"status":"PAID"}'
+```
+
+## Run the tests
 
 ```bash
 sbt test
 ```
 
-Tests use ScalaTest + Akka Typed TestKit and HTTP Route test support. They exercise routes and services without starting a full server. All basic tests pass with no external dependencies required.
+Coverage:
+- `OrderPersistentActorSpec` — state machine + validation (event sourcing)
+- `OrderRoutesSpec` — full HTTP REST lifecycle (POST, GET, PUT, 404, 400)
+- `AkkaHttpBaseSpec` — base endpoints
 
-## Extend for Real Projects
+## How it maps to the Caterpillar JD (Senior Software Engineer)
 
-- Add Akka Persistence for event-sourced aggregates (great for migrating legacy stateful systems).
-- Add Kafka consumer/producer (see flink-kafka-scala-base).
-- Call external AI agents (see whatsapp-grok-bot) for intelligent routing or enrichment.
-- Add clustering for scale.
-- Proxy legacy endpoints (simulate calling old monolith and modernizing the response).
+| JD requirement | Where in this repo |
+|---|---|
+| 2+ years Scala | entire codebase |
+| 2+ years Akka (Streams, Actors, HTTP, Persistence) | `OrderPersistentActor` (Persistence), `OrderRoutes` (HTTP), Akka Typed Actors |
+| Designing well-defined RESTful APIs | `OrderRoutes` — versionable, OpenAPI-ready |
+| High-availability, reliable solutions | Event Sourcing + Snapshotting + In-Memory journal swap to Cassandra for prod |
+| Application architectural patterns (MVC, Microservices, Event-driven) | EventSourcedBehavior + CQRS-ready |
+| PostgreSQL/NoSQL, AWS, CI/CD | swap `InMemoryOrderService` for `AkkaOrderService` + DB; see `scala-akka-aws-microservice` for the full AWS deploy |
 
-## Portfolio Mapping
+## Production notes
 
-This base supports claims around Scala/Akka for event-driven and resilient backends, often combined with Flink/Kafka for full modern architectures on top of legacy.
+The default `main` uses `InMemoryOrderService` so you can `sbt run` with no external dependencies. To switch to Akka Persistence:
 
-See the complete set:
-https://ivamartins.github.io/code-solutions-site/
+1. Start Cassandra: `docker run -p 9042:9042 cassandra:4.1`
+2. Replace the journal plugin in `application.conf`:
+   ```hocon
+   akka.persistence.journal.plugin = "akka.persistence.cassandra.journal"
+   akka.persistence.snapshot-store.plugin = "akka.persistence.cassandra.snapshot"
+   ```
+3. Add `akka-persistence-cassandra` to `build.sbt`.
+4. Bind `OrderRoutes` to `OrderPersistentActor` via ask-pattern (see `scala-akka-aws-microservice` for a full example).
 
-Company: https://www.linkedin.com/company/code-solutions-it/
-
-Clone, add your logic, use as proof or starting point for Akka-based services.
+See portfolio: https://ivamartins.github.io/code-solutions-site/
