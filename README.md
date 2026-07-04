@@ -1,62 +1,25 @@
 # akka-scala-base
 
-Base funcional em Akka (Typed + HTTP + Persistence) com Scala.
+> Part of the **Code Solutions Event-Driven & Streaming Toolkit** product line. Resilient services with Akka Typed, clustering, persistence (event-sourcing), and integrations for modern backends.
 
-**Português:**
-Framework principal para construir serviços resilientes, escaláveis e event-sourced com Akka. Inclui exemplo de Order domain com Event Sourcing (Akka Persistence Typed), HTTP REST API (Akka HTTP) e cobertura de testes completa.
+Minimal, functional Akka Typed base for building resilient services.
 
-**English:**
-Core framework for building resilient, scalable, event-sourced services with Akka. Includes an Order domain example with Event Sourcing (Akka Persistence Typed), HTTP REST API (Akka HTTP) and full test coverage.
+## Why this base
 
-## Why this base?
+- **Akka Typed** + HTTP, ready for clustering, persistence (event-sourcing), and modern integrations
+- **Real-world foundation** — extracted from the same patterns used to build the event-driven stack at **Sicredi Digital** (PFM crawler → full event-driven reference architecture)
+- **Composable** with Flink/Kafka streams (see `flink-kafka-scala-base`) and Akka HTTP
 
-- Demonstrates the "Scala/Akka" part of the stack.
-- Functional starting point for:
-  - High-performance HTTP APIs
-  - Event sourcing / persistence (Akka Persistence — perfect for legacy modernization)
-  - Clustering, sharding, persistence queries
-  - Integration with Kafka / Flink (combine with `flink-kafka-scala-base`)
-  - AI agent endpoints
-  - Legacy system proxies (wrap old Java / Play services)
+## Quick start
 
-## What's in this repo
-
-```
-akka-scala-base/
-├── src/main/scala/com/codesolutions/akka/
-│   ├── AkkaHttpBase.scala              # main() — boots the HTTP server
-│   ├── domain/Order.scala              # domain model
-│   ├── persistence/
-│   │   ├── OrderProtocol.scala         # Commands, Events, Responses
-│   │   ├── OrderPersistentActor.scala  # EventSourcedBehavior
-│   │   └── OrderService.scala          # service trait + InMemoryOrderService
-│   └── http/OrderRoutes.scala          # Akka HTTP routes (REST)
-├── src/main/resources/application.conf
-├── src/test/scala/com/codesolutions/akka/
-│   ├── AkkaHttpBaseSpec.scala
-│   ├── http/OrderRoutesSpec.scala
-│   └── persistence/OrderPersistentActorSpec.scala
-└── build.sbt
-```
-
-## How to run
+**Prerequisites:** Java + sbt.
 
 ```bash
+# Run the example
 sbt run
 ```
 
-Then in another terminal:
-
-```bash
-curl http://localhost:8080/hello
-curl -X POST http://localhost:8080/orders \
-  -H 'Content-Type: application/json' \
-  -d '{"orderId":"o1","customerId":"c1","amount":99.9}'
-curl http://localhost:8080/orders/o1
-curl -X PUT http://localhost:8080/orders/o1 \
-  -H 'Content-Type: application/json' \
-  -d '{"status":"PAID"}'
-```
+It will start an Akka HTTP server with a sample actor (event-sourced counter) and a health endpoint.
 
 ## Run the tests
 
@@ -64,33 +27,32 @@ curl -X PUT http://localhost:8080/orders/o1 \
 sbt test
 ```
 
-Coverage:
-- `OrderPersistentActorSpec` — state machine + validation (event sourcing)
-- `OrderRoutesSpec` — full HTTP REST lifecycle (POST, GET, PUT, 404, 400)
-- `AkkaHttpBaseSpec` — base endpoints
+## Extend for real use
 
-## How it maps to common Scala/Akka requirements
+- Add your domain actors with `EventSourcedBehavior` for event-sourcing
+- Configure Akka Cluster for horizontal scalability
+- Add Akka Streams / Alpakka for Kafka integration
+- Add Akka HTTP routes for your endpoints
+- Add observability with Kamon or OpenTelemetry
 
-| Requirement | Where in this repo |
-|---|---|
-| 2+ years Scala | entire codebase |
-| 2+ years Akka (Streams, Actors, HTTP, Persistence) | `OrderPersistentActor` (Persistence), `OrderRoutes` (HTTP), Akka Typed Actors |
-| Designing well-defined RESTful APIs | `OrderRoutes` — versionable, OpenAPI-ready |
-| High-availability, reliable solutions | Event Sourcing + Snapshotting + In-Memory journal swap to Cassandra for prod |
-| Application architectural patterns (MVC, Microservices, Event-driven) | EventSourcedBehavior + CQRS-ready |
-| PostgreSQL/NoSQL, AWS, CI/CD | swap `InMemoryOrderService` for `AkkaOrderService` + DB; see `scala-akka-aws-microservice` for the full AWS deploy |
+## Tech stack
 
-## Production notes
+- Scala 2.12
+- Akka Typed 2.5.x
+- Akka HTTP
+- Akka Persistence (event-sourcing)
+- sbt build tool
+- ScalaTest (unit tests)
 
-The default `main` uses `InMemoryOrderService` so you can `sbt run` with no external dependencies. To switch to Akka Persistence:
+> **Português?** Veja [`README.pt-BR.md`](./README.pt-BR.md).
 
-1. Start Cassandra: `docker run -p 9042:9042 cassandra:4.1`
-2. Replace the journal plugin in `application.conf`:
-   ```hocon
-   akka.persistence.journal.plugin = "akka.persistence.cassandra.journal"
-   akka.persistence.snapshot-store.plugin = "akka.persistence.cassandra.snapshot"
-   ```
-3. Add `akka-persistence-cassandra` to `build.sbt`.
-4. Bind `OrderRoutes` to `OrderPersistentActor` via ask-pattern (see `scala-akka-aws-microservice` for a full example).
+## See also
 
-See portfolio: https://ivamartins.github.io/code-solutions-site/
+- **Related base**: [scala-akka-aws-microservice](https://github.com/ivamartins/scala-akka-aws-microservice), [flink-kafka-scala-base](https://github.com/ivamartins/flink-kafka-scala-base)
+- **Product line**: [Event-Driven & Streaming Toolkit](https://ivamartins.github.io/code-solutions-site/#produtos)
+- **Code Solutions on LinkedIn**: [linkedin.com/company/code-solutions-it](https://www.linkedin.com/company/code-solutions-it/)
+- **All Code Solutions open source**: [github.com/ivamartins](https://github.com/ivamartins)
+
+## License
+
+MIT — see `LICENSE`.
