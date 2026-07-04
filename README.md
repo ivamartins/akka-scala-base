@@ -1,5 +1,8 @@
 # akka-scala-base
 
+[![CI](https://github.com/ivamartins/akka-scala-base/actions/workflows/ci.yml/badge.svg)](https://github.com/ivamartins/akka-scala-base/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 > Part of the **Code Solutions Event-Driven & Streaming Toolkit** product line. Resilient services with Akka Typed, clustering, persistence (event-sourcing), and integrations for modern backends.
 
 Minimal, functional Akka Typed base for building resilient services.
